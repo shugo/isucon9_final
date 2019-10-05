@@ -72,7 +72,9 @@ module Isutrain
       def seat_counts
         if SEAT_COUNTS.empty?
           result = db.xquery('SELECT train_class, seat_class, is_smoking_seat, COUNT(train_class) AS seat_count FROM `seat_master` GROUP BY train_class, seat_class, is_smoking_seat')
-          SEAT_COUNTS[result[:train_class], result[:seat_class], result[:is_smoking_seat]] = result[:seat_count]
+          result.each do |seat|
+            SEAT_COUNTS[seat[:train_class], seat[:seat_class], seat[:is_smoking_seat]] = seat[:seat_count]
+          end
         end
         SEAT_COUNTS
       end
