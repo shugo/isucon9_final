@@ -1,3 +1,4 @@
+/*
 CREATE INDEX index_search_train_timetable_master ON train_timetable_master(date, train_class, train_name, station);
 
 CREATE INDEX index_station_master_name ON station_master(name);
@@ -24,3 +25,11 @@ CREATE INDEX index_reservations_user_id ON reservations(user_id);
 
 CREATE INDEX index_seat_reservations_reservation_id ON seat_reservations(reservation_id);
 CREATE INDEX index_seat_reservations_car_number ON seat_reservations(car_number);
+*/
+
+CREATE INDEX index_seat_reservations_seat_column ON seat_reservations(seat_column);
+CREATE INDEX index_seat_reservations_seat_row ON seat_reservations(seat_row);
+
+CREATE INDEX index_reservations_train_class ON reservations(train_class);
+CREATE INDEX index_reservations_departure ON reservations(departure);
+CREATE INDEX index_reservations_arrival ON reservations(arrival);
