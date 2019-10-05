@@ -35,7 +35,7 @@ module Isutrain
       seat_list = all_seats.select { |seat|
         seat[:train_class] == train[:train_class] &&
           seat[:seat_class] == seat_class &&
-          seat[:is_smoking_seat] == (is_smoking_seat ? 1 : 0)
+          seat[:is_smoking_seat] == is_smoking_seat
       }
 
       available_seat_map = {}

@@ -43,6 +43,7 @@ module Isutrain
     set :sessions, key: 'session_isutrain', expire_after: 3600
 
     ALL_SEATS = []
+    ALL_STATIONS = []
 
     helpers do
       def db
@@ -62,9 +63,15 @@ module Isutrain
 
       def all_seats
         if ALL_SEATS.empty?
-          ALL_SEATS.replace(db.xquery('SELECT * FROM `seat_master`'))
+          ALL_SEATS.replace(db.xquery('SELECT * FROM `seat_master`').to_a)
         end
         ALL_SEATS
+      end
+      def all_stations
+        if ALL_STATIONS.empty?
+          ALL_STATIONS.replace(db.xquery("SELECT * FROM `station_master`").to_a)
+        end
+        ALL_STATIONS
       end
 
       def get_user
