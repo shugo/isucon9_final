@@ -84,8 +84,6 @@ __EOF
           seat[:seat_column],
         )
 
-        p seat_reservation_list
-
         seat_reservation_list.each do |seat_reservation|
           reservation = db.xquery(
             'SELECT * FROM `reservations` WHERE `reservation_id` = ?',
@@ -122,8 +120,6 @@ __EOF
             end
           end
         end
-
-        puts s[:is_occupied] ? 'true' : 'false'
 
         seat_information_list << s
       end
