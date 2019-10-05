@@ -23,6 +23,20 @@ module Isutrain
       also_reload './utils.rb'
     end
 
+    # ロガー
+    require 'sinatra/custom_logger'
+    require 'logger'
+    helpers Sinatra::CustomLogger
+    configure :development, :production do
+      log_path = "#{__dir__}/log/#{environment}.log"
+      STDOUT.reopen(log_path, "a")
+      #logger = Logger.new(File.open(log_path, 'a'))
+      logger = Logger.new($stdout) #File.open(log_path, 'a'))
+      logger.level = Logger::DEBUG if development?
+      set :logger, logger
+      use Rack::CommonLogger, logger
+    end
+
     set :protection, false
     set :show_exceptions, false
     set :session_secret, 'tagomoris'
