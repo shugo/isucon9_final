@@ -59,6 +59,8 @@ module Isutrain
         WHERE
           `r`.`date` = ? AND
           `r`.`reservation_id` = `sr`.`reservation_id` AND
+          `s`.`seat_class` = ? AND
+          `s`.`is_smoking_seat` = ? AND
           `s`.`train_class` = `r`.`train_class` AND
           `s`.`car_number` = `sr`.`car_number` AND
           `s`.`seat_column` = `sr`.`seat_column` AND
@@ -76,6 +78,8 @@ __EOF
       seat_reservation_list = db.xquery(
         query,
         train[:date],
+        seat_class,
+        is_smoking_seat,
         from_station[:id],
         from_station[:id],
         to_station[:id],
