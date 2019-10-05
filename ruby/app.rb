@@ -73,7 +73,7 @@ module Isutrain
         if SEAT_COUNTS.empty?
           result = db.xquery('SELECT train_class, seat_class, is_smoking_seat, COUNT(train_class) AS seat_count FROM `seat_master` GROUP BY train_class, seat_class, is_smoking_seat')
           result.each do |seat|
-            SEAT_COUNTS[seat[:train_class], seat[:seat_class], seat[:is_smoking_seat]] = seat[:seat_count]
+            SEAT_COUNTS[[seat[:train_class], seat[:seat_class], seat[:is_smoking_seat]]] = seat[:seat_count]
           end
         end
         SEAT_COUNTS
@@ -261,6 +261,10 @@ module Isutrain
           is_error: true,
           message: message,
         }
+        if $!
+          puts "ERROR: #{$!.inspect}"
+          puts $!.backtrace
+        end
 
         halt status, headers, response.to_json
       end
@@ -614,6 +618,8 @@ module Isutrain
     end
 
     error do |e|
+      puts "ERROR: #{e.inspect}"
+      puts e.backtrace
       content_type :json
       { is_error: true, message: e.message }.to_json
     end

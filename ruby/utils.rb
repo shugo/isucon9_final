@@ -32,7 +32,7 @@ module Isutrain
       # 指定種別の空き座席を返す
 
       # 全ての座席件数を取得する
-      max_seat_count = seat_counts[train[:train_class], seat_class, is_smoking_seat]
+      max_seat_count = seat_counts[[train[:train_class], seat_class, is_smoking_seat]] || 0
 
       query = <<__EOF
         SELECT

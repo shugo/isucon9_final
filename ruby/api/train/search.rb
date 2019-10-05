@@ -224,6 +224,10 @@ module Isutrain
       s = train_search_response_list.to_json
       puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
       s
+    rescue Exception => e
+      puts "ERROR: #{e.inspect}"
+      puts e.backtrace
+      raise
     end
   end
 end
