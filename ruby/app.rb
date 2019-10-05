@@ -42,6 +42,8 @@ module Isutrain
     set :session_secret, 'tagomoris'
     set :sessions, key: 'session_isutrain', expire_after: 3600
 
+    ALL_SEATS = []
+
     helpers do
       def db
         Thread.current[:db] ||= Mysql2::Client.new(
@@ -56,6 +58,13 @@ module Isutrain
           symbolize_keys: true,
           reconnect: true,
         )
+      end
+
+      def all_seats
+        if ALL_SEATS.empty?
+          ALL_SEATS.replace(db.xquery('SELECT * FROM `seat_master`'))
+        end
+        ALL_SEATS
       end
 
       def get_user
