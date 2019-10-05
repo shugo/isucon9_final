@@ -267,14 +267,18 @@ module Isutrain
     end
 
     get '/api/train/search' do
+      start_time = Time.now
       date = Time.iso8601(params[:use_at]).getlocal
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       halt_with_error 404, '予約可能期間外です' unless check_available_date(date)
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       from_station = db.xquery(
         'SELECT * FROM station_master WHERE name = ?',
         params[:from],
       ).first
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       if from_station.nil?
         puts 'fromStation: no rows'
@@ -285,6 +289,7 @@ module Isutrain
         'SELECT * FROM station_master WHERE name = ?',
         params[:to],
       ).first
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       if to_station.nil?
         puts 'toStation: no rows'
@@ -294,6 +299,7 @@ module Isutrain
       is_nobori = from_station[:distance] > to_station[:distance]
 
       usable_train_class_list = get_usable_train_class_list(from_station, to_station)
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       train_list = if params[:train_class].nil? || params[:train_class].empty?
         db.xquery(
@@ -311,10 +317,12 @@ module Isutrain
           params[:train_class],
         )
       end
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       stations = db.xquery(
         "SELECT * FROM `station_master` ORDER BY `distance` #{is_nobori ? 'DESC' : 'ASC'}",
       )
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
       puts "From #{from_station}"
       puts "To #{to_station}"
@@ -322,6 +330,7 @@ module Isutrain
       train_search_response_list = []
 
       train_list.each do |train|
+        puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
         is_seeked_to_first_station = false
         is_contains_origin_station = false
         is_contains_dest_station = false
@@ -374,6 +383,7 @@ module Isutrain
             from_station[:name],
             cast: false,
           ).first
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           departure_date = Time.parse("#{date.strftime('%Y/%m/%d')} #{departure[:departure]} +09:00 JST")
 
@@ -387,6 +397,7 @@ module Isutrain
             to_station[:name],
             cast: false,
           ).first
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           premium_avail_seats = get_available_seats(train, from_station, to_station, 'premium', false)
           premium_smoke_avail_seats = get_available_seats(train, from_station, to_station, 'premium', true)
@@ -429,16 +440,23 @@ module Isutrain
             reserved_smoke: reserved_smoke_avail,
             non_reserved: '○',
           }
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           # 料金計算
           premium_fare = fare_calc(date, from_station[:id], to_station[:id], train[:train_class], 'premium')
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
           premium_fare = premium_fare * params[:adult].to_i + premium_fare / 2 * params[:child].to_i
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           reserved_fare = fare_calc(date, from_station[:id], to_station[:id], train[:train_class], 'reserved')
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
           reserved_fare = reserved_fare * params[:adult].to_i + reserved_fare / 2 * params[:child].to_i
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           non_reserved_fare = fare_calc(date, from_station[:id], to_station[:id], train[:train_class], 'non-reserved')
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
           non_reserved_fare = non_reserved_fare * params[:adult].to_i + non_reserved_fare / 2 * params[:child].to_i
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           fare_information = {
             premium: premium_fare,
@@ -462,13 +480,19 @@ module Isutrain
           }
 
           train_search_response_list << train_search_response
+          puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
 
           break if train_search_response_list.length >= 10
         end
       end
 
       content_type :json
-      train_search_response_list.to_json
+      s = train_search_response_list.to_json
+      puts "/api/train/search:#{$$}:#{Thread.current.object_id}:#{__LINE__}: #{Time.now - start_time}"
+      s
+    rescue => e
+      puts "ERROR: #{e.inspect}"
+      puts e.backtrace
     end
 
     get '/api/train/seats' do
