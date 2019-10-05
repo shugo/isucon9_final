@@ -59,7 +59,7 @@ module Isutrain
           cast_booleans: true,
           symbolize_keys: true,
           reconnect: true,
-        )
+        ).tap { |db| db.query("SET innodb_lock_wait_timeout=1") }
       end
 
       def all_seats
