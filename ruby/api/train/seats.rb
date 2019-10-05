@@ -59,11 +59,13 @@ module Isutrain
 
         query = <<__EOF
           SELECT
-            `s`.*
+            `s`.*,
+            `r`.departure, `r`.arrival
           FROM
             `seat_reservations` `s`,
             `reservations` `r`
           WHERE
+            `s`.reservation_id = `r`.reservation_id AND
             `r`.`date` = ? AND
             `r`.`train_class` = ? AND
             `r`.`train_name` = ? AND
@@ -83,13 +85,8 @@ __EOF
         )
 
         seat_reservation_list.each do |seat_reservation|
-          reservation = db.xquery(
-            'SELECT * FROM `reservations` WHERE `reservation_id` = ?',
-            seat_reservation[:reservation_id],
-          ).first
-
-          departure_station = all_stations.find{|x| x[:name] == reservation[:departure]}
-          arrival_station = all_stations.find{|x| x[:name] == reservation[:arrival]}
+          departure_station = all_stations.find{|x| x[:name] == seat_reservation[:departure]}
+          arrival_station = all_stations.find{|x| x[:name] == seat_reservation[:arrival]}
 
           if train[:is_nobori]
             # 上り
