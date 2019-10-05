@@ -125,26 +125,38 @@ __EOF
       end
 
       # 各号車の情報
-      simple_car_information_list = []
-      i = 1
-      loop do
-        seat = db.xquery(
-          'SELECT * FROM `seat_master` WHERE `train_class` = ? AND `car_number` = ? ORDER BY `seat_row`, `seat_column` LIMIT 1',
-          params[:train_class],
-          i,
-        ).first
+      #simple_car_information_list = []
+      #i = 1
+      #loop do
+      #  seat = db.xquery(
+      #    'SELECT * FROM `seat_master` WHERE `train_class` = ? AND `car_number` = ? ORDER BY `seat_row`, `seat_column` LIMIT 1',
+      #    params[:train_class],
+      #    i,
+      #  ).first
 
-        break if seat.nil?
+      #  break if seat.nil?
 
-        simple_car_information = {
-          car_number: i,
-          seat_class: seat[:seat_class],
+      #  simple_car_information = {
+      #    car_number: i,
+      #    seat_class: seat[:seat_class],
+      #  }
+
+      #  simple_car_information_list << simple_car_information
+
+      #  i += 1
+      #end
+      items = db.xquery(
+				%q(SELECT seat_class, car_number FROM `seat_master`
+           WHERE `train_class` = ? AND `seat_row` = 1 AND `seat_column` = 'A'),
+				params[:train_class],
+			)
+      simple_car_information_list = items.map{|item|
+        {
+          car_number: item[:car_number],
+          seat_class: item[:seat_class],
         }
+      }
 
-        simple_car_information_list << simple_car_information
-
-        i += 1
-      end
 
       c = {
         date: date.strftime('%Y/%m/%d'),
