@@ -42,11 +42,9 @@ module Isutrain
         halt_with_error 400, 'invalid train_class'
       end
 
-      seat_list = db.xquery(
-        'SELECT * FROM `seat_master` WHERE `train_class` = ? AND `car_number` = ? ORDER BY `seat_row`, `seat_column`',
-        params[:train_class],
-        params[:car_number],
-      )
+      seat_list = all_seats.select{|x|
+        x[:train_class] == params[:train_class] && x[:car_number] == params[:car_number].to_i
+      }
 
       seat_information_list = []
 
@@ -90,15 +88,8 @@ __EOF
             seat_reservation[:reservation_id],
           ).first
 
-          departure_station = db.xquery(
-            'SELECT * FROM `station_master` WHERE `name` = ?',
-            reservation[:departure],
-          ).first
-
-          arrival_station = db.xquery(
-            'SELECT * FROM `station_master` WHERE `name` = ?',
-            reservation[:arrival],
-          ).first
+          departure_station = all_stations.find{|x| x[:name] == reservation[:departure]}
+          arrival_station = all_stations.find{|x| x[:name] == reservation[:arrival]}
 
           if train[:is_nobori]
             # 上り
