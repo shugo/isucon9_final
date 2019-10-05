@@ -31,25 +31,12 @@ module Isutrain
     def get_available_seats(train, from_station, to_station, seat_class, is_smoking_seat)
       # 指定種別の空き座席を返す
 
-      # 全ての座席を取得する
-      seat_list = all_seats.select { |seat|
-        seat[:train_class] == train[:train_class] &&
-          seat[:seat_class] == seat_class &&
-          seat[:is_smoking_seat] == is_smoking_seat
-      }
-
-      available_seat_map = {}
-      seat_list.each do |seat|
-        key = "#{seat[:car_number]}_#{seat[:seat_row]}_#{seat[:seat_column]}"
-        available_seat_map[key] = seat
-      end
+      # 全ての座席件数を取得する
+      max_seat_count = seat_counts[train[:train_class], seat_class, is_smoking_seat]
 
       query = <<__EOF
         SELECT
-          `sr`.`reservation_id`,
-          `sr`.`car_number`,
-          `sr`.`seat_row`,
-          `sr`.`seat_column`
+          COUNT(`sr`.`reservation_id`) AS seat_count
         FROM
           `seat_reservations` `sr`,
           `reservations` `r`,
@@ -75,7 +62,7 @@ __EOF
         query += 'AND ((`std`.`id` <= ? AND ? < `sta`.`id`) OR (`std`.`id` <= ? AND ? < `sta`.`id`) OR (`sta`.`id` < ? AND ? < `std`.`id`))'
       end
 
-      seat_reservation_list = db.xquery(
+      reserved_seat_count = db.xquery(
         query,
         train[:date],
         seat_class,
@@ -86,14 +73,9 @@ __EOF
         to_station[:id],
         from_station[:id],
         to_station[:id],
-      )
+      ).first[:seat_count]
 
-      seat_reservation_list.each do |seat_reservation|
-        key = "#{seat_reservation[:car_number]}_#{seat_reservation[:seat_row]}_#{seat_reservation[:seat_column]}"
-        available_seat_map.delete(key)
-      end
-
-      available_seat_map.values
+      max_seat_count - reserved_seat_count
     end
   end
 end

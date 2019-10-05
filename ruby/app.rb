@@ -43,6 +43,7 @@ module Isutrain
     set :sessions, key: 'session_isutrain', expire_after: 3600
 
     ALL_SEATS = []
+    SEAT_COUNTS = {}
     ALL_STATIONS = []
 
     helpers do
@@ -67,6 +68,15 @@ module Isutrain
         end
         ALL_SEATS
       end
+
+      def seat_counts
+        if SEAT_COUNTS.empty?
+          result = db.xquery('SELECT train_class, seat_class, is_smoking_seat, COUNT(train_class) AS seat_count FROM `seat_master` GROUP BY train_class, seat_class, is_smoking_seat')
+          SEAT_COUNTS[result[:train_class], result[:seat_class], result[:is_smoking_seat]] = result[:seat_count]
+        end
+        SEAT_COUNTS
+      end
+
       def all_stations
         if ALL_STATIONS.empty?
           ALL_STATIONS.replace(db.xquery("SELECT * FROM `station_master`").to_a)

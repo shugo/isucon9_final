@@ -139,30 +139,30 @@ module Isutrain
           reserved_smoke_avail_seats = get_available_seats(train, from_station, to_station, 'reserved', true)
 
           premium_avail = '○'
-          if premium_avail_seats.length.zero?
+          if premium_avail_seats.zero?
             premium_avail = '×'
-          elsif premium_avail_seats.length < 10
+          elsif premium_avail_seats < 10
             premium_avail = '△'
           end
 
           premium_smoke_avail = '○'
-          if premium_smoke_avail_seats.length.zero?
+          if premium_smoke_avail_seats.zero?
             premium_smoke_avail = '×'
-          elsif premium_smoke_avail_seats.length < 10
+          elsif premium_smoke_avail_seats < 10
             premium_smoke_avail = '△'
           end
 
           reserved_avail = '○'
-          if reserved_avail_seats.length.zero?
+          if reserved_avail_seats.zero?
             reserved_avail = '×'
-          elsif reserved_avail_seats.length < 10
+          elsif reserved_avail_seats < 10
             reserved_avail = '△'
           end
 
           reserved_smoke_avail = '○'
-          if reserved_smoke_avail_seats.length.zero?
+          if reserved_smoke_avail_seats.zero?
             reserved_smoke_avail = '×'
-          elsif reserved_smoke_avail_seats.length < 10
+          elsif reserved_smoke_avail_seats < 10
             reserved_smoke_avail = '△'
           end
 
